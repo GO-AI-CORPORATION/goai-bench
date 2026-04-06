@@ -1,0 +1,63 @@
+﻿language: mos_Latn
+
+tasks:
+  mt:
+    sources:
+      - id: goai_flores_fra_mos
+        hf_dataset: goaicorp/flores-plus-fra-mos
+        source_column: sentence_fra_Latn
+        target_column: sentence_mos_Latn
+        source_lang: fra_Latn
+        target_lang: mos_Latn
+        domain_column: domain
+        benchmark_groups:
+          general:
+            splits: [test, devtest]
+            description: "FLORES+ general knowledge (test + devtest)"
+          health:
+            splits: [health]
+            description: "Health domain sentences"
+          education:
+            splits: [education]
+            description: "Education domain sentences"
+          child_protection:
+            splits: [child_protection]
+            description: "Child protection domain sentences"
+          environment:
+            splits: [environment]
+            description: "Environment domain sentences"
+
+  asr:
+    sources:
+      - id: goai_moore_speech
+        hf_dataset: goaicorp/GOAI-MooreSpeechCorpora
+        audio_column: audio
+        text_column: text
+        language: mos_Latn
+        benchmark_groups:
+          general:
+            splits: [test]
+            description: "Moore speech test set (1012 samples)"
+
+  tts:
+    sources:
+      - id: goai_flores_tts
+        hf_dataset: goaicorp/flores-plus-fra-mos
+        text_column: sentence_mos_Latn
+        language: mos_Latn
+        benchmark_groups:
+          general:
+            splits: [test, devtest]
+            description: "FLORES+ general knowledge (test + devtest)"
+          health:
+            splits: [health]
+            description: "Health domain sentences"
+          education:
+            splits: [education]
+            description: "Education domain sentences"
+          child_protection:
+            splits: [child_protection]
+            description: "Child protection domain sentences"
+          environment:
+            splits: [environment]
+            description: "Environment domain sentences"

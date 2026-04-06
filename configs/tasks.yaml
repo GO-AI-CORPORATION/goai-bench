@@ -1,0 +1,52 @@
+tasks:
+  mt:
+    name: Machine Translation
+    description: >
+      Evaluate translation quality between French/English and target local languages. Supports both directions.
+    primary_metric: chrf
+    primary_metric_name: chrF++
+    secondary_metrics:
+      - bleu
+      - ter
+      - comet_kiwi
+    direction: higher_is_better
+    requires_source_lang: true
+    requires_target_lang: true
+    default_batch_size: 16
+    baseline_models:
+      - facebook/nllb-200-3.3B
+      - facebook/nllb-200-distilled-1.3B
+      - facebook/nllb-200-distilled-600M
+
+  asr:
+    name: Automatic Speech Recognition
+    description: >
+      Evaluate speech-to-text transcription accuracy on target local languages.
+    primary_metric: wer
+    primary_metric_name: WER
+    secondary_metrics:
+      - cer
+      - mer
+    direction: lower_is_better
+    requires_audio: true
+    default_batch_size: 8
+    baseline_models:
+      - openai/whisper-large-v3
+      - openai/whisper-medium
+      - facebook/mms-300m
+      - facebook/mms-1b-all
+
+  tts:
+    name: Text-to-Speech
+    description: >
+      Evaluate synthesized speech quality via naturalness (UTMOS) and intelligibility (loopback ASR WER).
+    primary_metric: utmos
+    primary_metric_name: UTMOS
+    secondary_metrics:
+      - loopback_wer
+      - loopback_cer
+    direction: higher_is_better
+    requires_loopback_asr: true
+    default_batch_size: 4
+    baseline_models:
+      - facebook/mms-tts

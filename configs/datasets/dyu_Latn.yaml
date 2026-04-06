@@ -1,0 +1,63 @@
+﻿language: dyu_Latn
+
+tasks:
+  mt:
+    sources:
+      - id: goai_flores_fra_dyu
+        hf_dataset: goaicorp/flores-plus-fra-dyu
+        source_column: sentence_fra_Latn
+        target_column: sentence_dyu_Latn
+        source_lang: fra_Latn
+        target_lang: dyu_Latn
+        domain_column: domain
+        benchmark_groups:
+          general:
+            splits: [test, devtest]
+            description: "FLORES+ general knowledge (test + devtest)"
+          health:
+            splits: [health]
+            description: "Health domain sentences"
+          education:
+            splits: [education]
+            description: "Education domain sentences"
+          child_protection:
+            splits: [child_protection]
+            description: "Child protection domain sentences"
+          environment:
+            splits: [environment]
+            description: "Environment domain sentences"
+
+  asr:
+    sources:
+      - id: goai_dioula_speech
+        hf_dataset: goaicorp/goai-dioula-speech
+        audio_column: audio
+        text_column: dyu
+        language: dyu_Latn
+        benchmark_groups:
+          general:
+            splits: [dev]
+            description: "Dioula speech dev set"
+
+  tts:
+    sources:
+      - id: goai_flores_tts_dyu
+        hf_dataset: goaicorp/flores-plus-fra-dyu
+        text_column: sentence_dyu_Latn
+        language: dyu_Latn
+        benchmark_groups:
+          general:
+            splits: [test, devtest]
+            description: "FLORES+ general knowledge (test + devtest)"
+          health:
+            splits: [health]
+            description: "Health domain sentences"
+          education:
+            splits: [education]
+            description: "Education domain sentences"
+          child_protection:
+            splits: [child_protection]
+            description: "Child protection domain sentences"
+          environment:
+            splits: [environment]
+            description: "Environment domain sentences"

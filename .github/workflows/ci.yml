@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          # Install lightweight metric deps (no heavy ML models in CI)
+          pip install sacrebleu jiwer pyyaml filelock pandas numpy matplotlib seaborn
+
+      - name: Run tests
+        run: |
+          pytest tests/ -v --tb=short --cov=african_nlp_benchmark --cov-report=term-missing
+
+      - name: Check package importable
+        run: |
+          python -c "from african_nlp_benchmark.tasks.mt import MTEvaluator; print('OK')"
+          python -c "from african_nlp_benchmark.core.data_loader import DataLoader; print('OK')"
+          python -c "from african_nlp_benchmark.metrics.mt_metrics import compute_chrf; print('OK')"

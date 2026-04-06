@@ -1,0 +1,34 @@
+languages:
+  mos_Latn:
+    name: Mooré
+    iso_639_3: mos
+    hf_code: mos_Latn
+    flores_code: mos_Latn
+    fleurs_code: null
+    common_voice_code: null
+    nllb_code: mos_Latn
+    script: Latin
+    family: Gur (Oti-Volta)
+    region: Burkina Faso, Ghana, Togo
+    resource_level: low
+    notes: >
+      Dominant language of Burkina Faso with ~8M speakers.
+      Good FLORES-200 coverage. No FLEURS or Common Voice data.
+      Some orthographic variation exists between Burkina and Ghana varieties.
+
+  dyu_Latn:
+    name: Dioula
+    iso_639_3: dyu
+    hf_code: dyu_Latn
+    flores_code: dyu_Latn
+    fleurs_code: null
+    common_voice_code: null
+    nllb_code: dyu_Latn
+    script: Latin
+    family: Mande
+    region: Burkina Faso, Côte d'Ivoire, Mali
+    resource_level: low
+    notes: >
+      Major lingua franca of West Africa (~12M speakers).
+      Also known as Dyula or Jula. Closely related to Bambara.
+      FLORES-200 coverage available. No FLEURS data.

@@ -1,0 +1,82 @@
+domains:
+  health:
+    name: Health
+    description: >
+      Health-related content including maternal and child health,
+      vaccination, nutrition, disease prevention,
+      and public health messaging.
+    keywords:
+      - santé
+      - vaccination
+      - nutrition
+      - maladie
+      - hôpital
+      - médecin
+      - paludisme
+      - VIH
+    unicef_relevance: >
+      Critical for UNICEF health programming: ensuring NLP tools
+      accurately handle health-related communications in local languages
+      for community health workers and public health campaigns.
+
+  education:
+    name: Education
+    description: >
+      Educational content including school enrollment, literacy,
+      teacher training, and learning materials.
+    keywords:
+      - école
+      - éducation
+      - enseignant
+      - apprentissage
+      - alphabétisation
+      - formation
+    unicef_relevance: >
+      Supports UNICEF education programmes: translation of learning
+      materials, educational chatbots, and literacy tools.
+
+  child_protection:
+    name: Child Protection
+    description: >
+      Content related to child protection including birth registration,
+      child labor, child marriage, violence prevention,
+      and child welfare services.
+    keywords:
+      - protection
+      - enfant
+      - enregistrement
+      - naissance
+      - violence
+      - travail des enfants
+      - mariage
+    unicef_relevance: >
+      Essential for UNICEF child protection: accurate processing of
+      case management data, helpline communications, and awareness
+      campaign materials in local languages.
+
+  environment:
+    name: Environment
+    description: >
+      Environmental content including climate change, water and
+      sanitation, natural disasters, and environmental education.
+    keywords:
+      - environnement
+      - eau
+      - assainissement
+      - climat
+      - sécheresse
+      - inondation
+    unicef_relevance: >
+      Relevant to UNICEF WASH and climate programmes: ensuring
+      environmental messaging reaches communities in their own languages.
+
+  general:
+    name: General
+    description: >
+      Cross-domain baseline text from standard benchmarks
+      (FLORES-200, FLEURS). Covers news, Wikipedia, and
+      general-purpose text.
+    keywords: []
+    unicef_relevance: >
+      Provides a general-purpose baseline for model performance
+      comparison across all domains.
