@@ -1,5 +1,3 @@
-# GO AI Bench
-
 <p align="center">
   <img src="assets/go-ai-bench-logo.png" alt="GO AI Bench" width="100%" />
 </p>
