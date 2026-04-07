@@ -30,10 +30,10 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/ -v --tb=short --cov=african_nlp_benchmark --cov-report=term-missing
+          pytest tests/ -v --tb=short --cov=goai_bench --cov-report=term-missing
 
       - name: Check package importable
         run: |
-          python -c "from african_nlp_benchmark.tasks.mt import MTEvaluator; print('OK')"
-          python -c "from african_nlp_benchmark.core.data_loader import DataLoader; print('OK')"
-          python -c "from african_nlp_benchmark.metrics.mt_metrics import compute_chrf; print('OK')"
+          python -c "from goai_bench.tasks.mt import MTEvaluator; print('OK')"
+          python -c "from goai_bench.core.data_loader import DataLoader; print('OK')"
+          python -c "from goai_bench.metrics.mt_metrics import compute_chrf; print('OK')"

@@ -6,8 +6,6 @@ venv/
 env/
 benchmarking-report/
 NOTES.txt
-tests/
-
 
 # OS
 .DS_Store
