@@ -1,11 +1,43 @@
 # GO AI Bench
 
+<p align="center">
+  <img src="assets/go-ai-bench-logo.png" alt="GO AI Bench" width="85%" />
+</p>
+
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-green.svg)](https://python.org)
+[![HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Leaderboard-blue)](https://huggingface.co/spaces/goaicorp/goai-bench-leaderboard)
+[![GO AI Corp](https://img.shields.io/badge/GO%20AI%20Corp-Website-green?logo=googlechrome&logoColor=green)](https://goaicorporation.org/)
+[![HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Organization-blue)](https://huggingface.co/goaicorp)
+![Visitors](https://hitscounter.dev/api/hit?url=https%3A%2F%2Fgithub.com%2FGO-AI-CORPORATION%2Fgoai-bench&label=Visitors&icon=people&color=%23FFA500)
 
-Open benchmarking toolkit for evaluating NLP models on low-resource Burkinabè languages, developed by **GO AI Corporation**. Currently focuses on **Mooré** and **Dioula** across three evaluation tasks: **MT**, **ASR**, and **TTS**.
+Open benchmarking toolkit for evaluating NLP models on low-resource Burkinabè languages, developed by **GO AI Corporation**. Currently focuses on **Mooré** and **Dioula** across three evaluation tasks: **Machine Translation (MT)**, **Automatic Speech Recognition (ASR)**, and **Text-to-Speech (TTS)**. **Public rankings and results** are on the [GO AI Bench Leaderboard](https://huggingface.co/spaces/goaicorp/goai-bench-leaderboard) (Hugging Face Space).
+
+If your question is not covered here or in the docs below, open a [GitHub issue](https://github.com/GO-AI-CORPORATION/goai-bench/issues) or reach us via [goaicorporation.org](https://goaicorporation.org/).
 
 **Documentation** (detailed guides): **[English](docs/README.md)** — la même documentation est disponible **en français** sous [`docs/fr/`](docs/fr/) (voir l’index [docs/README.md](docs/README.md)).
+
+## Table of Contents
+
+- [Updates](#updates)
+- [Supported Languages](#supported-languages)
+- [Supported Tasks](#supported-tasks)
+- [Architecture (overview)](#architecture-overview)
+- [Setup](#setup)
+- [Usage (quick examples)](#usage-quick-examples)
+- [Python API](#python-api)
+- [Roadmap](#roadmap)
+- [Citation](#citation)
+- [Acknowledgments](#acknowledgments)
+- [License](#license)
+
+---
+
+<a name="updates"></a>
+
+## Updates
+
+- [04/2026] **Major update:** released **[GO AI Bench v0.1.0](https://github.com/GO-AI-CORPORATION/goai-bench)** (this toolkit) and **[GO AI Bench Leaderboard v0.1.0](https://huggingface.co/spaces/goaicorp/goai-bench-leaderboard)** — browse Mooré and Dioula results for ASR, TTS, and MT on the Space. [![HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Leaderboard-blue)](https://huggingface.co/spaces/goaicorp/goai-bench-leaderboard)
 
 ---
 
@@ -123,7 +155,7 @@ print(f"BLEU:   {result.overall_bleu:.1f}")
 - **Proprietary API providers** -- interfaces for commercial MT/ASR/TTS APIs (Google, Azure, OpenAI) so they can be benchmarked alongside open models.
 - **Local dataset support** -- re-enable benchmarking from local TSV/audio files for offline or private datasets.
 - **Additional Burkinabe languages** -- Fulfulde, Gourmantchema, Bissa, Lobiri, and other national languages.
-- **HuggingFace Spaces leaderboard** -- interactive web dashboard at `huggingface.co/spaces/goaicorp/goai-bench`.
+- **Hugging Face Spaces leaderboard** -- evolve the interactive dashboard ([goai-bench-leaderboard](https://huggingface.co/spaces/goaicorp/goai-bench-leaderboard)); v0.1.0 is live — further features and languages as above.
 - **Docker evaluation** -- containerized evaluation for reproducible benchmarks.
 - **Quality estimation** -- reference-free MT quality metrics for zero-resource scenarios.
 
