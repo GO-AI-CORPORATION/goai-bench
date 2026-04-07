@@ -1,7 +1,7 @@
 # GO AI Bench
 
 <p align="center">
-  <img src="assets/go-ai-bench-logo.png" alt="GO AI Bench" width="85%" />
+  <img src="assets/go-ai-bench-logo.png" alt="GO AI Bench" width="100%" />
 </p>
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
