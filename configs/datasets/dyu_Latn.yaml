@@ -1,29 +1,42 @@
 ﻿language: dyu_Latn
 
+# MT and TTS use the FLORES+ dev and devtest splits of goaicorp/DioulaMTBench
+# (gated, manual approval: HF_TOKEN must belong to an account with access).
+# The four domain groups are disabled until their data is fixed.
+
 tasks:
   mt:
     sources:
-      - id: goai_flores_fra_dyu
-        hf_dataset: goaicorp/flores-plus-fra-dyu
-        source_column: sentence_fra_Latn
-        target_column: sentence_dyu_Latn
+      - id: dioula_mt_bench_flores
+        hf_dataset: goaicorp/DioulaMTBench
+        hf_config: flores
+        hf_revision: v1.0
+        source_column: fra
+        target_column: dyu
         source_lang: fra_Latn
         target_lang: dyu_Latn
-        domain_column: domain
+        language_columns:
+          eng_Latn: eng
+          fra_Latn: fra
+          dyu_Latn: dyu
         benchmark_groups:
           general:
-            splits: [test, devtest]
-            description: "FLORES+ general knowledge (test + devtest)"
+            splits: [dev, devtest]
+            description: "FLORES+ general knowledge (dev + devtest)"
           health:
+            disabled: true
             splits: [health]
             description: "Health domain sentences"
           education:
+            disabled: true
             splits: [education]
             description: "Education domain sentences"
           child_protection:
+            disabled: true
             splits: [child_protection]
             description: "Child protection domain sentences"
           environment:
+            disabled: true
             splits: [environment]
             description: "Environment domain sentences"
 
@@ -41,23 +54,29 @@ tasks:
 
   tts:
     sources:
-      - id: goai_flores_tts_dyu
-        hf_dataset: goaicorp/flores-plus-fra-dyu
-        text_column: sentence_dyu_Latn
+      - id: dioula_mt_bench_flores_tts
+        hf_dataset: goaicorp/DioulaMTBench
+        hf_config: flores
+        hf_revision: v1.0
+        text_column: dyu
         language: dyu_Latn
         benchmark_groups:
           general:
-            splits: [test, devtest]
-            description: "FLORES+ general knowledge (test + devtest)"
+            splits: [dev, devtest]
+            description: "FLORES+ general knowledge (dev + devtest)"
           health:
+            disabled: true
             splits: [health]
             description: "Health domain sentences"
           education:
+            disabled: true
             splits: [education]
             description: "Education domain sentences"
           child_protection:
+            disabled: true
             splits: [child_protection]
             description: "Child protection domain sentences"
           environment:
+            disabled: true
             splits: [environment]
             description: "Environment domain sentences"

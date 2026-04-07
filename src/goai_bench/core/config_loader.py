@@ -91,6 +91,7 @@ class ConfigLoader:
         language: str,
         task: str,
         source_id: Optional[str] = None,
+        include_disabled: bool = False,
     ) -> Dict[str, Dict[str, Any]]:
         """Get benchmark groups defined for a language/task source.
 
@@ -98,6 +99,7 @@ class ConfigLoader:
             language: HF language code.
             task: Task name.
             source_id: Optional source ID.
+            include_disabled: Also return groups marked ``disabled``.
 
         Returns:
             Dict mapping group name to group config (with ``splits`` list).
@@ -106,7 +108,17 @@ class ConfigLoader:
         source = self.get_dataset_source(language, task, source_id)
         if not source:
             return {}
-        return source.get("benchmark_groups", {})
+        groups = source.get("benchmark_groups", {})
+        if include_disabled:
+            return groups
+        skipped = [name for name, grp in groups.items() if grp.get("disabled")]
+        if skipped:
+            logger.warning(
+                "%s/%s: skipping disabled benchmark groups %s "
+                "(temporarily unavailable, will be fixed later)",
+                language, task, skipped,
+            )
+        return {n: g for n, g in groups.items() if not g.get("disabled")}
 
     def get_available_languages(self) -> List[str]:
         """Return list of language HF codes that have config files."""

@@ -179,13 +179,99 @@ class TestExplicitDatasetMerge:
     @patch("goai_bench.core.data_loader.DataLoader._load_hf_dataset")
     def test_tts_merge_overrides_hf_dataset_only(self, mock_load, loader):
         yaml_like = {
-            "hf_dataset": "goaicorp/flores-plus-fra-mos",
-            "text_column": "sentence_mos_Latn",
+            "hf_dataset": "goaicorp/MooreMTBench",
+            "text_column": "mos",
             "language": "mos_Latn",
         }
         merged = {**yaml_like, "hf_dataset": "user/custom-tts-prompts"}
-        rows = [{"sentence_mos_Latn": "Ne y beogo"}]
-        mock_load.return_value = _fake_hf_dataset(rows, ["sentence_mos_Latn"])
+        rows = [{"mos": "Ne y beogo"}]
+        mock_load.return_value = _fake_hf_dataset(rows, ["mos"])
         data = loader.load_from_config(merged, "tts", split="test")
         assert len(data) == 1
         mock_load.assert_called_once_with("user/custom-tts-prompts", "test")
+
+
+MTBENCH_MT = {
+    "hf_dataset": "goaicorp/MooreMTBench",
+    "hf_config": "flores",
+    "hf_revision": "v1.0",
+    "source_column": "fra",
+    "target_column": "mos",
+    "source_lang": "fra_Latn",
+    "target_lang": "mos_Latn",
+    "language_columns": {"eng_Latn": "eng", "fra_Latn": "fra", "mos_Latn": "mos"},
+    "benchmark_groups": {
+        "general": {"splits": ["dev", "devtest"]},
+        "health": {"disabled": True, "splits": ["health"]},
+    },
+}
+
+
+class TestBenchmarkRepos:
+    """MooreMTBench / DioulaMTBench: config name, revision, columns, disabled groups."""
+
+    @patch("goai_bench.core.data_loader.DataLoader._load_hf_dataset")
+    def test_config_and_revision_passed(self, mock_load, loader):
+        rows = [{"fra": "Bonjour", "mos": "Ne y beogo"}]
+        mock_load.return_value = _fake_hf_dataset(rows, ["id", "eng", "fra", "mos"])
+        data = loader.load_from_config(MTBENCH_MT, "mt", split="dev")
+        assert data[0]["source"] == "Bonjour"
+        assert data[0]["domain"] == "general"
+        mock_load.assert_called_once_with(
+            "goaicorp/MooreMTBench", "dev", config="flores", revision="v1.0",
+        )
+
+    @patch("goai_bench.core.data_loader.DataLoader._load_hf_dataset")
+    def test_reverse_direction_uses_language_columns(self, mock_load, loader):
+        rows = [{"fra": "Bonjour", "mos": "Ne y beogo"}]
+        mock_load.return_value = _fake_hf_dataset(rows, ["fra", "mos"])
+        cfg = {**MTBENCH_MT, "source_lang": "mos_Latn", "target_lang": "fra_Latn"}
+        data = loader.load_from_config(cfg, "mt", split="devtest")
+        assert data[0]["source"] == "Ne y beogo"
+        assert data[0]["reference"] == "Bonjour"
+
+    @patch("goai_bench.core.data_loader.DataLoader._load_hf_dataset")
+    def test_disabled_group_is_skipped(self, mock_load, loader):
+        data = loader.load_benchmark_group(MTBENCH_MT, "mt", "health")
+        assert data == []
+        mock_load.assert_not_called()
+
+    @patch("goai_bench.core.data_loader.DataLoader._load_hf_dataset")
+    def test_general_group_merges_dev_and_devtest(self, mock_load, loader):
+        rows = [{"fra": "A", "mos": "B"}]
+        mock_load.return_value = _fake_hf_dataset(rows, ["fra", "mos"])
+        data = loader.load_benchmark_group(MTBENCH_MT, "mt", "general")
+        assert len(data) == 2
+        assert [c.args[1] for c in mock_load.call_args_list] == ["dev", "devtest"]
+
+    def test_load_dataset_receives_config_and_revision(self, loader):
+        with patch("datasets.load_dataset") as mock_ld:
+            loader._load_hf_dataset("goaicorp/DioulaMTBench", "dev", config="flores", revision="v1.0")
+        mock_ld.assert_called_once_with(
+            "goaicorp/DioulaMTBench", "flores", split="dev",
+            revision="v1.0", trust_remote_code=False, token=loader._hf_token,
+        )
+
+
+class TestShippedConfigs:
+    """The YAML configs point at the benchmark repos and disable the domain groups."""
+
+    @pytest.mark.parametrize("lang, repo", [
+        ("mos_Latn", "goaicorp/MooreMTBench"),
+        ("dyu_Latn", "goaicorp/DioulaMTBench"),
+    ])
+    def test_mt_and_tts_sources(self, lang, repo):
+        from goai_bench.core.config_loader import ConfigLoader
+
+        cfg = ConfigLoader()
+        for task in ("mt", "tts"):
+            src = cfg.get_dataset_source(lang, task)
+            assert src["hf_dataset"] == repo
+            assert src["hf_config"] == "flores"
+            assert str(src["hf_revision"]) == "v1.0"
+            assert list(cfg.get_benchmark_groups(lang, task)) == ["general"]
+            all_groups = cfg.get_benchmark_groups(lang, task, include_disabled=True)
+            assert set(all_groups) == {
+                "general", "health", "education", "child_protection", "environment",
+            }
+            assert all_groups["general"]["splits"] == ["dev", "devtest"]

@@ -7,6 +7,31 @@ from goai_bench.utils.hf_utils import get_hf_token
 
 logger = logging.getLogger(__name__)
 
+DISABLED_GROUP_MESSAGE = (
+    "temporarily unavailable, will be fixed later. "
+    "Only the general FLORES+ group runs for now."
+)
+
+
+def is_group_disabled(group_cfg: Optional[Dict[str, Any]]) -> bool:
+    """Return True when a benchmark group is marked ``disabled`` in YAML."""
+    return bool(group_cfg and group_cfg.get("disabled"))
+
+
+def disabled_reason(group_cfg: Dict[str, Any]) -> str:
+    """Message shown when a disabled benchmark group is skipped."""
+    return group_cfg.get("disabled_reason") or DISABLED_GROUP_MESSAGE
+
+
+def hub_kwargs(source_cfg: Dict[str, Any]) -> Dict[str, str]:
+    """Optional dataset config name and revision from a YAML source."""
+    kwargs = {}
+    if source_cfg.get("hf_config"):
+        kwargs["config"] = source_cfg["hf_config"]
+    if source_cfg.get("hf_revision"):
+        kwargs["revision"] = str(source_cfg["hf_revision"])
+    return kwargs
+
 
 class DataLoader:
     """Load evaluation data from HuggingFace Hub.
@@ -66,10 +91,16 @@ class DataLoader:
                         aligned_src, aligned_tgt, src_col, tgt_col,
                     )
                 src_col, tgt_col = aligned_src, aligned_tgt
+            # Repos with one column per language (e.g. MooreMTBench: fra, mos)
+            # map language codes to columns, so mos->fra runs also work.
+            lang_cols = source_cfg.get("language_columns") or {}
+            if src_lang in lang_cols and tgt_lang in lang_cols:
+                src_col, tgt_col = lang_cols[src_lang], lang_cols[tgt_lang]
             domain_col = source_cfg.get("domain_column")
             return self._load_mt_hf(
                 dataset_id, resolved_split, src_col, tgt_col,
                 domain, max_samples, domain_col=domain_col,
+                hub_kwargs=hub_kwargs(source_cfg),
             )
         if task == "asr":
             return self._load_asr_hf(source_cfg, split, max_samples)
@@ -105,6 +136,11 @@ class DataLoader:
         group = groups.get(group_name)
         if not group:
             logger.warning("Benchmark group '%s' not found in config", group_name)
+            return []
+        if is_group_disabled(group):
+            logger.warning(
+                "Skipping benchmark group '%s': %s", group_name, disabled_reason(group),
+            )
             return []
 
         splits = group.get("splits", [])
@@ -172,12 +208,20 @@ class DataLoader:
     # HuggingFace loading — unified helpers
     # ==================================================================
 
-    def _load_hf_dataset(self, dataset_id: str, split: str) -> Any:
+    def _load_hf_dataset(
+        self,
+        dataset_id: str,
+        split: str,
+        config: Optional[str] = None,
+        revision: Optional[str] = None,
+    ) -> Any:
         """Load a single HF dataset split with token support.
 
         Args:
             dataset_id: HuggingFace dataset identifier.
             split: Dataset split name.
+            config: Optional dataset config (subset) name, YAML ``hf_config``.
+            revision: Optional tag, branch or commit, YAML ``hf_revision``.
 
         Returns:
             HF dataset object, or ``None`` on failure.
@@ -187,7 +231,9 @@ class DataLoader:
 
             return load_dataset(
                 dataset_id,
+                config,
                 split=split,
+                revision=revision,
                 trust_remote_code=False,
                 token=self._hf_token,
             )
@@ -228,6 +274,7 @@ class DataLoader:
         domain: str,
         max_samples: Optional[int],
         domain_col: Optional[str] = None,
+        hub_kwargs: Optional[Dict[str, str]] = None,
     ) -> List[Dict[str, Any]]:
         """Load MT data from a HuggingFace dataset.
 
@@ -239,11 +286,12 @@ class DataLoader:
             domain: Domain filter or ``"all"``.
             max_samples: Cap samples.
             domain_col: Optional column for per-row domain labels.
+            hub_kwargs: Optional ``config`` / ``revision`` for the Hub load.
 
         Returns:
             List of MT sample dicts.
         """
-        ds = self._load_hf_dataset(dataset_id, split)
+        ds = self._load_hf_dataset(dataset_id, split, **(hub_kwargs or {}))
         if ds is None:
             return []
 
@@ -270,7 +318,7 @@ class DataLoader:
             row_domain = "general"
             if domain_col and domain_col in ds.column_names:
                 row_domain = row.get(domain_col, "general") or "general"
-            elif split not in ("test", "devtest", "train", "validation"):
+            elif split not in ("dev", "test", "devtest", "train", "validation"):
                 row_domain = split
             elif domain != "all":
                 row_domain = domain
@@ -314,7 +362,7 @@ class DataLoader:
         audio_col = source_cfg.get("audio_column", "audio")
         text_col = source_cfg.get("text_column", "text")
 
-        ds = self._load_hf_dataset(dataset_id, resolved_split)
+        ds = self._load_hf_dataset(dataset_id, resolved_split, **hub_kwargs(source_cfg))
         if ds is None:
             return []
 
@@ -373,7 +421,7 @@ class DataLoader:
         text_col = source_cfg.get("text_column", "text")
         domain_col = source_cfg.get("domain_column")
 
-        ds = self._load_hf_dataset(dataset_id, resolved_split)
+        ds = self._load_hf_dataset(dataset_id, resolved_split, **hub_kwargs(source_cfg))
         if ds is None:
             return []
 
@@ -392,7 +440,7 @@ class DataLoader:
             row_domain = "general"
             if domain_col and domain_col in ds.column_names:
                 row_domain = row.get(domain_col, "general") or "general"
-            elif resolved_split not in ("test", "devtest", "train", "validation"):
+            elif resolved_split not in ("dev", "test", "devtest", "train", "validation"):
                 row_domain = resolved_split
 
             if domain != "all" and row_domain != domain:

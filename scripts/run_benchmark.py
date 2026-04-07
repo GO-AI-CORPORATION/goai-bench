@@ -157,6 +157,17 @@ def main(
     else:
         groups = cfg.get_benchmark_groups(language, task)
         if group:
+            all_groups = cfg.get_benchmark_groups(
+                language, task, include_disabled=True,
+            )
+            if group in all_groups and group not in groups:
+                from goai_bench.core.data_loader import disabled_reason
+
+                console.print(
+                    f"[yellow]Group '{group}' is disabled: "
+                    f"{disabled_reason(all_groups[group])}[/]"
+                )
+                return
             if group not in groups:
                 console.print(
                     f"[red]Group '{group}' not found. "
